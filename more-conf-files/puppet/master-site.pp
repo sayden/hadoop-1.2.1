@@ -15,15 +15,15 @@ exec {'clone-repository':
 # Set the file permissions to Hadoop directory
 file { "/var/hadoop":
 	recurse => true,
-	owner => "vagrant",
-	group => "vagrant",
+	owner => "ubuntu",
+	group => "ubuntu",
 }
 
 # Open Firewall ports
-exec {'open-firewall':
-	command =>'/usr/bin/service firewalld stop',
-	onlyif => '/usr/bin/test -e /lib/systemd/system/firewalld.service'
-}
+#exec {'open-firewall':
+#	command =>'/usr/bin/service firewalld stop',
+#	onlyif => '/usr/bin/test -e /lib/systemd/system/firewalld.service'
+#}
 
 # Create hdfs dir
 exec {'create-hdfs-dir':
@@ -36,8 +36,8 @@ exec {'create-hdfs-dir':
 # master -> master and master -> slaves
 # Configure first the master -> master access
 exec{'master-to-master-ssh-access':
-	command => '/usr/bin/ssh-keygen -t rsa -P "" -f /home/vagrant/.ssh/passless',
-	unless => '/usr/bin/test -f /home/vagrant/.ssh/passless'
+	command => '/usr/bin/ssh-keygen -t rsa -P "" -f /home/ubuntu/.ssh/passless',
+	unless => '/usr/bin/test -f /home/ubuntu/.ssh/passless'
 }
 
 # Install Java
