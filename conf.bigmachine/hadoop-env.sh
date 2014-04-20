@@ -53,8 +53,7 @@ export HADOOP_JOBTRACKER_OPTS="-Dcom.sun.management.jmxremote $HADOOP_JOBTRACKER
 # The scheduling priority for daemon processes.  See 'man nice'.
 # export HADOOP_NICENESS=10
 export HADOOP_OPTS=-Djava.net.preferIPv4Stack=true
-export HADOOP_INSTALL=/var/hadoop
+export HADOOP_INSTALL=/var/hadoop-1.2.1
 export PATH=$PATH:$HADOOP_INSTALL/bin:$HADOOP_INSTALL/sbin
-export HADOOP_PREFIX=/var/hadoop
-export HADOOP_CONF_DIR=$HADOOP_INSTALL/conf.aws
-export JAVA_HOME=/usr/lib/jvm/java-1.6.0-openjdk-amd64
+export HADOOP_PREFIX=/var/hadoop-1.2.1
+

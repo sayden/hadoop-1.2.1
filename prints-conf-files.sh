@@ -40,6 +40,6 @@ echo ''
 
 # masters y slaves
 echo '############################ masters / slaves ################################################'
-awk '{print "masters: " $1}' $HADOOP_INSTALL/conf/masters
-awk '{print "slaves: " $1}' $HADOOP_INSTALL/conf/slaves
+awk '{print "masters: " $0}' $HADOOP_INSTALL/conf/masters
+awk '{print "slaves: " $0}' $HADOOP_INSTALL/conf/slaves
 echo ''

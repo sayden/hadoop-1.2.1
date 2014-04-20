@@ -4,7 +4,7 @@
 
 <property>
     <name>mapred.job.tracker</name>
-    <value>172.31.32.80:54311</value>
+    <value>172.31.3.43:54311</value>
 </property>
 
 </configuration>
