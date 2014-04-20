@@ -7,13 +7,13 @@ echo ''
 if [ $# -eq 0 ]; then
 	echo 'Not enough arguments. Usage:'
 	echo '	timer action [params...]'
-	echo '		sa: aka "sbin/start-all.sh"'
-	echo '		ka: aka "sbin/stop-all.sh"'
-	echo '		sd: aka "sbin/start-dfs.sh"'
-	echo '		sm: aka "sbin/start-mapred.sh"'
-	echo '		km: aka "sbin/stop-mapred.sh"'
-	echo '		kd: aka "sbin/stop-dfs.sh"'
-	echo '		restart: aka "sbin/stop-all.sh ; sbin/start-all.sh"'
+	echo '		sa: aka "bin/start-all.sh"'
+	echo '		ka: aka "bin/stop-all.sh"'
+	echo '		sd: aka "bin/start-dfs.sh"'
+	echo '		sm: aka "bin/start-mapred.sh"'
+	echo '		km: aka "bin/stop-mapred.sh"'
+	echo '		kd: aka "bin/stop-dfs.sh"'
+	echo '		restart: aka "bin/stop-all.sh ; bin/start-all.sh"'
 	echo '		cp [arg]: aka "sudo netstat -atnp | grep [arg]"'
 	echo ' 		cp: aka "sudo netstat -atnp"'
 	echo '		lsm: aka "bin/hadoop dfsadmin -safemode leave"'
@@ -38,17 +38,17 @@ else
 			echo '		timer cf [folder-to-delete]'
 		    fi
 			;;
-		sa) sbin/start-all.sh
+		sa) bin/start-all.sh
 			;;
-		ka) sbin/stop-all.sh
+		ka) bin/stop-all.sh
 			;;
-		sd) sbin/start-dfs.sh
+		sd) bin/start-dfs.sh
 			;;
-		sm) sbin/start-mapred.sh
+		sm) bin/start-mapred.sh
 			;;
-		km) sbin/stop-mapred.sh
+		km) bin/stop-mapred.sh
 			;;
-		kd) sbin/stop-dfs.sh
+		kd) bin/stop-dfs.sh
 			;;
 		lsm) bin/hadoop dfsadmin -safemode leave
 			;;
@@ -63,7 +63,7 @@ else
 				echo 'usage: timer -wc example-name input output'
 			fi
 			;;
-		restart) sbin/stop-all.sh;sbin/start-all.sh
+		restart) bin/stop-all.sh;bin/start-all.sh
 			;;
 		cp) if [ $# -eq 2 ]; then
 				sudo netstat -atnp | grep $2

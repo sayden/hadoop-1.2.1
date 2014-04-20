@@ -7,7 +7,7 @@ package {'git': ensure => installed }
 
 # Clone hadoop repository
 exec {'clone-repository': 
-	command => '/usr/bin/git clone https://github.com/sayden/hadoop-0.20.git /var/hadoop',
+	command => '/usr/bin/git clone https://github.com/sayden/hadoop-1.2.1.git /var/hadoop',
 	require => Package['git'],
 	unless => '/usr/bin/test -e /var/hadoop'
 }
