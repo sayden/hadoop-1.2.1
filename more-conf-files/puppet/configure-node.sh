@@ -1,21 +1,23 @@
 #! /bin/bash
 
+user = ubuntu
+
 #Check if there is arguemnts
 if [ $# -ne 0 ]; then
 	#Send the apt-get update command to update repositories
-	ssh -i $1 ubuntu@$2 'sudo apt-get update -y'
+	ssh -i $1 $user@$2 'sudo apt-get update -y'
 	echo 'apt-get update done'
 
 	#Install puppet
-	ssh -i $1 ubuntu@$2 'sudo apt-get install -y puppet'
+	ssh -i $1 $user@$2 'sudo apt-get install -y puppet'
 	echo 'Puppet installed'
 
 	#Send the puppet provisioning file
-	scp -i $1 $3 ubuntu@$2:/home/ubuntu
+	scp -i $1 $3 $user@$2:/home/$user
 	echo 'Puppet file sent'
 
 	#Execute the provisioning on the target machine
-	ssh -i $1 ubuntu@$2 'sudo puppet apply $2'
+	ssh -i $1 $user@$2 'sudo puppet apply $2'
 	echo 'Machine provisioned'
 
 	#Final message
