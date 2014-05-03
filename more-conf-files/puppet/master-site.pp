@@ -7,7 +7,7 @@
 #
 
 # User
-$INSTALL_USER = "MaC"
+$INSTALL_USER = "ubuntu"
 
 # Hadoop install dir
 $HADOOP_INSTALL = "/var/hadoop"
@@ -15,14 +15,13 @@ $HADOOP_INSTALL = "/var/hadoop"
 # Update repositories
 
 # Install git and Java
-package {'git': 			ensure => installed }
-package {'java-1.7.0-openjdk': 	ensure => installed }
+package {"git": 			ensure => present }
+package {"openjdk-6-jdk": 	ensure => present }
 
 # Clone hadoop repository
-exec {'clone-repository': 
-	command => '/usr/bin/git clone https://github.com/sayden/hadoop-1.2.1.git $HADOOP_INSTALL',
-	require => Package['git'],
-	onlyif => '/usr/bin/test -e $HADOOP_INSTALL'
+exec {"clone-repository": 
+	command => "/usr/bin/git clone https://github.com/sayden/hadoop-1.2.1.git $HADOOP_INSTALL",
+	require => Package["git"]
 }
 
 # Set the file permissions to Hadoop directory
@@ -36,12 +35,12 @@ file { "$HADOOP_INSTALL":
 # TODO
 
 # Create hdfs dir
-exec {'create-hdfs-dir':
-	command => '/bin/mkdir /var/hadoop/hdfs',
+exec {"create-hdfs-dir":
+	command => "/bin/mkdir /var/hadoop/hdfs",
 	onlyif => "/usr/bin/test -e $HADOOP_INSTALL/hdfs"
 }
 
 # Export env vars
-exec {'env-vars':
-	command => "/bin/bash /home/${INSTALL_USER}/set-env-vars.sh"
+exec {"env-vars":
+	command => "/bin/bash /home/$INSTALL_USER/set-env-vars"
 }
