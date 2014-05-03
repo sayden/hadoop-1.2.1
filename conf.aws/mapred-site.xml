@@ -7,4 +7,19 @@
     <value>172.31.3.43:54311</value>
 </property>
 
+<property>
+        <name>mapred.tasktracker.map.tasks.maximum</name>
+        <value>1</value>
+</property>
+
+        <property>
+                <name>mapred.tasktracker.reduce.tasks.maximum</name>
+                <value>1</value>
+        <property>
+
+<property>
+	<name>mapred.child.java.opt</name>
+	<value>-Xmx396</value>
+</property>
+
 </configuration>
