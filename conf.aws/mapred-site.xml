@@ -8,7 +8,7 @@
 </property>
 <property>
 	<name>mapred.child.java.opt</name>
-	<value>-Xmx396</value>
+	<value>-Xmx256</value>
 </property>
 <property>
 	<name>mapred.reduce.max.attempts</name>
