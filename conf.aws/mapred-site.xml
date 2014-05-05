@@ -18,7 +18,14 @@
         <name>mapred.map.max.attempts</name>
         <value>200</value>
 </property>
-
+<property> 
+  <name>mapred.max.tracker.failures</name> 
+  <value>200</value> 
+</property> 
+<property> 
+  <name>mapred.max.tracker.failures</name> 
+  <value>200</value> 
+</property> 
 <property>
         <name>mapred.tasktracker.map.tasks.maximum</name>
         <value>1</value>
