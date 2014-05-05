@@ -11,4 +11,3 @@ else
 	echo "Use: send-to-master FILE MASTER-IP [ROUTE]"
 	echo "If no route specified, it will send it to /home/ubuntu"
 fi
-
