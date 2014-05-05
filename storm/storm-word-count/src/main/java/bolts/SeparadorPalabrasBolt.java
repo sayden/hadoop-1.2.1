@@ -12,6 +12,10 @@ import backtype.storm.tuple.Values;
 
 public class SeparadorPalabrasBolt extends BaseRichBolt 
 {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -505615409788951751L;
 	private OutputCollector colector;
 
 	/**
@@ -54,7 +58,7 @@ public class SeparadorPalabrasBolt extends BaseRichBolt
 	 * Prepara el bolt para los datos que va a tener que usar
 	 */
 	@Override
-	public void prepare(Map map, TopologyContext ctx, OutputCollector colector)
+	public void prepare(@SuppressWarnings("rawtypes") Map map, TopologyContext ctx, OutputCollector colector)
 	{
 		this.colector = colector;
 	}

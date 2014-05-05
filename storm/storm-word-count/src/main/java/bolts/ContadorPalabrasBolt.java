@@ -11,6 +11,10 @@ import backtype.storm.tuple.Tuple;
 
 public class ContadorPalabrasBolt extends BaseRichBolt 
 {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -9211454481547491256L;
 	private String nombre;
 	private Integer id;
 	private OutputCollector colector;
@@ -38,7 +42,7 @@ public class ContadorPalabrasBolt extends BaseRichBolt
 	}
 
 	@Override
-	public void prepare(Map map, TopologyContext ctx, OutputCollector colector)
+	public void prepare(@SuppressWarnings("rawtypes") Map map, TopologyContext ctx, OutputCollector colector)
 	{
 		this.cuenta = new HashMap<String, Integer>();
 		this.colector = colector;

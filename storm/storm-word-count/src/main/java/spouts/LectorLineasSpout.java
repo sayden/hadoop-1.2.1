@@ -14,6 +14,10 @@ import backtype.storm.tuple.Values;
 
 public class LectorLineasSpout extends BaseRichSpout
 {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 6785329165603525275L;
 	private boolean completado = false;
 	private FileReader lectorFichero;
 	private SpoutOutputCollector colector;
@@ -26,12 +30,12 @@ public class LectorLineasSpout extends BaseRichSpout
 	 * vamos a leer
 	 */
 	@Override
-	public void open(Map map, TopologyContext ctx, 
+	public void open(@SuppressWarnings("rawtypes") Map map, TopologyContext ctx, 
 			SpoutOutputCollector colector) 
 	{
 		try 
 		{
-			this.ctx = ctx;
+			this.setCtx(ctx);
 			
 			//Creamos un lector de ficheros
 			this.lectorFichero = new FileReader(
@@ -85,6 +89,14 @@ public class LectorLineasSpout extends BaseRichSpout
 	public void declareOutputFields(OutputFieldsDeclarer declarador)
 	{
 		declarador.declare(new Fields("linea"));
+	}
+
+	public TopologyContext getCtx() {
+		return ctx;
+	}
+
+	public void setCtx(TopologyContext ctx) {
+		this.ctx = ctx;
 	}
 
 }
