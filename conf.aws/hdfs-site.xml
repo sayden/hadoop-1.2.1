@@ -4,17 +4,12 @@
 
 	<property>
 		<name>dfs.replication</name>
-		<value>2</value>
+		<value>3</value>
 	</property>
 
 	<property>
 		<name>dfs.permissions</name>
 		<value>false</value>
-	</property>
-
-	<property>
-		<name>mapred.child.java.opts</name>
-		<value>-Xmx486m</value>
 	</property>
 
 	<property>
