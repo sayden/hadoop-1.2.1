@@ -57,4 +57,4 @@ export HADOOP_INSTALL=/var/hadoop
 export PATH=$PATH:$HADOOP_INSTALL/bin:$HADOOP_INSTALL/sbin
 export HADOOP_PREFIX=/var/hadoop
 export HADOOP_CONF_DIR=$HADOOP_INSTALL/conf.aws
-export JAVA_HOME=/usr/lib/jvm/java-1.6.0-openjdk-amd64
+export JAVA_HOME=/usr/lib/jvm/java-1.7.0-openjdk
