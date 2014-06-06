@@ -8,7 +8,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Flume 1.4.0 User Guide &mdash; Apache Flume  documentation</title>
+    <title>Flume 1.5.0 User Guide &mdash; Apache Flume  documentation</title>
     
     <link rel="stylesheet" href="_static/default.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -43,8 +43,8 @@
         <div class="bodywrapper">
           <div class="body">
             
-  <div class="section" id="flume-1-4-0-user-guide">
-<h1>Flume 1.4.0 User Guide<a class="headerlink" href="#flume-1-4-0-user-guide" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="flume-1-5-0-user-guide">
+<h1>Flume 1.5.0 User Guide<a class="headerlink" href="#flume-1-5-0-user-guide" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="introduction">
 <h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="overview">
@@ -139,7 +139,7 @@ agent process dies can&#8217;t be recovered.</p>
 <div class="section" id="setting-up-an-agent">
 <h3>Setting up an agent<a class="headerlink" href="#setting-up-an-agent" title="Permalink to this headline">¶</a></h3>
 <p>Flume agent configuration is stored in a local configuration file.  This is a
-text file which has a format follows the Java properties file format.
+text file that follows the Java properties file format.
 Configurations for one or more agents can be specified in the same
 configuration file. The configuration file includes properties of each source,
 sink and channel in an agent and how they are wired together to form data
@@ -702,6 +702,14 @@ Required properties are in <strong>bold</strong>.</p>
 <td>JKS</td>
 <td>The type of the Java keystore. This can be &#8220;JKS&#8221; or &#8220;PKCS12&#8221;.</td>
 </tr>
+<tr class="row-even"><td>ipFilter</td>
+<td>false</td>
+<td>Set this to true to enable ipFiltering for netty</td>
+</tr>
+<tr class="row-odd"><td>ipFilter.rules</td>
+<td>&#8211;</td>
+<td>Define N netty ipFilter pattern rules with this config.</td>
+</tr>
 </tbody>
 </table>
 <p>Example for agent named a1:</p>
@@ -713,6 +721,15 @@ Required properties are in <strong>bold</strong>.</p>
 <span class="na">a1.sources.r1.port</span> <span class="o">=</span> <span class="s">4141</span>
 </pre></div>
 </div>
+<p>Example of ipFilter.rules</p>
+<p>ipFilter.rules defines N netty ipFilters separated by a comma a pattern rule must be in this format.</p>
+<p>&lt;&#8217;allow&#8217; or deny&gt;:&lt;&#8217;ip&#8217; or &#8216;name&#8217; for computer name&gt;:&lt;pattern&gt;
+or
+allow/deny:ip/name:pattern</p>
+<p>example: ipFilter.rules=allow:ip:127.*,allow:name:localhost,deny:ip:*</p>
+<p>Note that the first rule to match will apply as the example below shows from a client on the localhost</p>
+<p>This will Allow the client on localhost be deny clients from any other ip &#8220;allow:name:localhost,deny:ip:<em>&#8221;
+This will deny the client on localhost be allow clients from any other ip &#8220;deny:name:localhost,allow:ip:</em>&#8220;</p>
 </div>
 <div class="section" id="thrift-source">
 <h4>Thrift Source<a class="headerlink" href="#thrift-source" title="Permalink to this headline">¶</a></h4>
@@ -1038,9 +1055,9 @@ cases in which events may be duplicated if certain downstream failures occur.
 This is consistent with the guarantees offered by other Flume components.</p>
 <table border="1" class="docutils">
 <colgroup>
-<col width="15%" />
-<col width="11%" />
-<col width="74%" />
+<col width="6%" />
+<col width="4%" />
+<col width="89%" />
 </colgroup>
 <thead valign="bottom">
 <tr class="row-odd"><th class="head">Property Name</th>
@@ -1071,11 +1088,19 @@ This is consistent with the guarantees offered by other Flume components.</p>
 </tr>
 <tr class="row-odd"><td>fileHeader</td>
 <td>false</td>
-<td>Whether to add a header storing the filename</td>
+<td>Whether to add a header storing the absolute path filename.</td>
 </tr>
 <tr class="row-even"><td>fileHeaderKey</td>
 <td>file</td>
-<td>Header key to use when appending filename to header</td>
+<td>Header key to use when appending absolute path filename to event header.</td>
+</tr>
+<tr class="row-odd"><td>basenameHeader</td>
+<td>false</td>
+<td>Whether to add a header storing the basename of the file.</td>
+</tr>
+<tr class="row-even"><td>basenameHeaderKey</td>
+<td>basename</td>
+<td>Header Key to use when appending  basename of file to event header.</td>
 </tr>
 <tr class="row-odd"><td>ignorePattern</td>
 <td>^$</td>
@@ -1086,6 +1111,21 @@ This is consistent with the guarantees offered by other Flume components.</p>
 <td>Directory to store metadata related to processing of files.
 If this path is not an absolute path, then it is interpreted as relative to the spoolDir.</td>
 </tr>
+<tr class="row-odd"><td>consumeOrder</td>
+<td>oldest</td>
+<td>In which order files in the spooling directory will be consumed <tt class="docutils literal"><span class="pre">oldest</span></tt>,
+<tt class="docutils literal"><span class="pre">youngest</span></tt> and <tt class="docutils literal"><span class="pre">random</span></tt>. In case of <tt class="docutils literal"><span class="pre">oldest</span></tt> and <tt class="docutils literal"><span class="pre">youngest</span></tt>, the last modified
+time of the files will be used to compare the files. In case of a tie, the file
+with smallest laxicographical order will be consumed first. In case of <tt class="docutils literal"><span class="pre">random</span></tt> any
+file will be picked randomly. When using <tt class="docutils literal"><span class="pre">oldest</span></tt> and <tt class="docutils literal"><span class="pre">youngest</span></tt> the whole
+directory will be scanned to pick the oldest/youngest file, which might be slow if there
+are a large number of files, while using <tt class="docutils literal"><span class="pre">random</span></tt> may cause old files to be consumed
+very late if new files keep coming in the spooling directory.</td>
+</tr>
+<tr class="row-even"><td>maxBackoff</td>
+<td>4000</td>
+<td>The maximum time (in millis) to wait between consecutive attempts to write to the channel(s) if the channel is full. The source will start at a low backoff and increase it exponentially each time the channel throws a ChannelException, upto the value specified by this parameter.</td>
+</tr>
 <tr class="row-odd"><td>batchSize</td>
 <td>100</td>
 <td>Granularity at which to batch transfer to the channel</td>
@@ -1094,37 +1134,45 @@ If this path is not an absolute path, then it is interpreted as relative to the 
 <td>UTF-8</td>
 <td>Character set used by deserializers that treat the input file as text.</td>
 </tr>
-<tr class="row-odd"><td>deserializer</td>
+<tr class="row-odd"><td>decodeErrorPolicy</td>
+<td><tt class="docutils literal"><span class="pre">FAIL</span></tt></td>
+<td>What to do when we see a non-decodable character in the input file.
+<tt class="docutils literal"><span class="pre">FAIL</span></tt>: Throw an exception and fail to parse the file.
+<tt class="docutils literal"><span class="pre">REPLACE</span></tt>: Replace the unparseable character with the &#8220;replacement character&#8221; char,
+typically Unicode U+FFFD.
+<tt class="docutils literal"><span class="pre">IGNORE</span></tt>: Drop the unparseable character sequence.</td>
+</tr>
+<tr class="row-even"><td>deserializer</td>
 <td><tt class="docutils literal"><span class="pre">LINE</span></tt></td>
 <td>Specify the deserializer used to parse the file into events.
 Defaults to parsing each line as an event. The class specified must implement
 <tt class="docutils literal"><span class="pre">EventDeserializer.Builder</span></tt>.</td>
 </tr>
-<tr class="row-even"><td>deserializer.*</td>
+<tr class="row-odd"><td>deserializer.*</td>
 <td>&nbsp;</td>
 <td>Varies per event deserializer.</td>
 </tr>
-<tr class="row-odd"><td>bufferMaxLines</td>
+<tr class="row-even"><td>bufferMaxLines</td>
 <td>&#8211;</td>
 <td>(Obselete) This option is now ignored.</td>
 </tr>
-<tr class="row-even"><td>bufferMaxLineLength</td>
+<tr class="row-odd"><td>bufferMaxLineLength</td>
 <td>5000</td>
 <td>(Deprecated) Maximum length of a line in the commit buffer. Use deserializer.maxLineLength instead.</td>
 </tr>
-<tr class="row-odd"><td>selector.type</td>
+<tr class="row-even"><td>selector.type</td>
 <td>replicating</td>
 <td>replicating or multiplexing</td>
 </tr>
-<tr class="row-even"><td>selector.*</td>
+<tr class="row-odd"><td>selector.*</td>
 <td>&nbsp;</td>
 <td>Depends on the selector.type value</td>
 </tr>
-<tr class="row-odd"><td>interceptors</td>
+<tr class="row-even"><td>interceptors</td>
 <td>&#8211;</td>
 <td>Space-separated list of interceptors</td>
 </tr>
-<tr class="row-even"><td>interceptors.*</td>
+<tr class="row-odd"><td>interceptors.*</td>
 <td>&nbsp;</td>
 <td>&nbsp;</td>
 </tr>
@@ -1138,6 +1186,79 @@ Defaults to parsing each line as an event. The class specified must implement
 <span class="na">agent-1.sources.src-1.channels</span> <span class="o">=</span> <span class="s">ch-1</span>
 <span class="na">agent-1.sources.src-1.spoolDir</span> <span class="o">=</span> <span class="s">/var/log/apache/flumeSpool</span>
 <span class="na">agent-1.sources.src-1.fileHeader</span> <span class="o">=</span> <span class="s">true</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="twitter-1-firehose-source-experimental">
+<h4>Twitter 1% firehose Source (experimental)<a class="headerlink" href="#twitter-1-firehose-source-experimental" title="Permalink to this headline">¶</a></h4>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">This source is hightly experimental and may change between minor versions of Flume.
+Use at your own risk.</p>
+</div>
+<p>Experimental source that connects via Streaming API to the 1% sample twitter
+firehose, continously downloads tweets, converts them to Avro format and
+sends Avro events to a downstream Flume sink. Requires the consumer and
+access tokens and secrets of a Twitter developer account.
+Required properties are in <strong>bold</strong>.</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="18%" />
+<col width="9%" />
+<col width="72%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Property Name</th>
+<th class="head">Default</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><strong>channels</strong></td>
+<td>&#8211;</td>
+<td>&nbsp;</td>
+</tr>
+<tr class="row-odd"><td><strong>type</strong></td>
+<td>&#8211;</td>
+<td>The component type name, needs to be <tt class="docutils literal"><span class="pre">org.apache.flume.source.twitter.TwitterSource</span></tt></td>
+</tr>
+<tr class="row-even"><td><strong>consumerKey</strong></td>
+<td>&#8211;</td>
+<td>OAuth consumer key</td>
+</tr>
+<tr class="row-odd"><td><strong>consumerSecret</strong></td>
+<td>&#8211;</td>
+<td>OAuth consumer secret</td>
+</tr>
+<tr class="row-even"><td><strong>accessToken</strong></td>
+<td>&#8211;</td>
+<td>OAuth access token</td>
+</tr>
+<tr class="row-odd"><td><strong>accessTokenSecret</strong></td>
+<td>&#8211;</td>
+<td>OAuth toekn secret</td>
+</tr>
+<tr class="row-even"><td>maxBatchSize</td>
+<td>1000</td>
+<td>Maximum number of twitter messages to put in a single batch</td>
+</tr>
+<tr class="row-odd"><td>maxBatchDurationMillis</td>
+<td>1000</td>
+<td>Maximum number of milliseconds to wait before closing a batch</td>
+</tr>
+</tbody>
+</table>
+<p>Example for agent named a1:</p>
+<div class="highlight-properties"><div class="highlight"><pre><span class="na">a1.sources</span> <span class="o">=</span> <span class="s">r1</span>
+<span class="na">a1.channels</span> <span class="o">=</span> <span class="s">c1</span>
+<span class="na">a1.sources.r1.type</span> <span class="o">=</span> <span class="s">org.apache.flume.source.twitter.TwitterSource</span>
+<span class="na">a1.sources.r1.channels</span> <span class="o">=</span> <span class="s">c1</span>
+<span class="na">a1.sources.r1.consumerKey</span> <span class="o">=</span> <span class="s">YOUR_TWITTER_CONSUMER_KEY</span>
+<span class="na">a1.sources.r1.consumerSecret</span> <span class="o">=</span> <span class="s">YOUR_TWITTER_CONSUMER_SECRET</span>
+<span class="na">a1.sources.r1.accessToken</span> <span class="o">=</span> <span class="s">YOUR_TWITTER_ACCESS_TOKEN</span>
+<span class="na">a1.sources.r1.accessTokenSecret</span> <span class="o">=</span> <span class="s">YOUR_TWITTER_ACCESS_TOKEN_SECRET</span>
+<span class="na">a1.sources.r1.maxBatchSize</span> <span class="o">=</span> <span class="s">10</span>
+<span class="na">a1.sources.r1.maxBatchDurationMillis</span> <span class="o">=</span> <span class="s">200</span>
 </pre></div>
 </div>
 <div class="section" id="event-deserializers">
@@ -1411,19 +1532,24 @@ of characters separated by a newline (&#8216;n&#8217;).</p>
 <td>2500</td>
 <td>Maximum size of a single event line, in bytes</td>
 </tr>
-<tr class="row-odd"><td>selector.type</td>
+<tr class="row-odd"><td>keepFields</td>
+<td>false</td>
+<td>Setting this to true will preserve the Priority,
+Timestamp and Hostname in the body of the event.</td>
+</tr>
+<tr class="row-even"><td>selector.type</td>
 <td>&nbsp;</td>
 <td>replicating or multiplexing</td>
 </tr>
-<tr class="row-even"><td>selector.*</td>
+<tr class="row-odd"><td>selector.*</td>
 <td>replicating</td>
 <td>Depends on the selector.type value</td>
 </tr>
-<tr class="row-odd"><td>interceptors</td>
+<tr class="row-even"><td>interceptors</td>
 <td>&#8211;</td>
 <td>Space-separated list of interceptors</td>
 </tr>
-<tr class="row-even"><td>interceptors.*</td>
+<tr class="row-odd"><td>interceptors.*</td>
 <td>&nbsp;</td>
 <td>&nbsp;</td>
 </tr>
@@ -1481,43 +1607,48 @@ basis.</p>
 <td>2500</td>
 <td>Maximum size of a single event line, in bytes.</td>
 </tr>
-<tr class="row-odd"><td>portHeader</td>
+<tr class="row-odd"><td>keepFields</td>
+<td>false</td>
+<td>Setting this to true will preserve the
+Priority, Timestamp and Hostname in the body of the event.</td>
+</tr>
+<tr class="row-even"><td>portHeader</td>
 <td>&#8211;</td>
 <td>If specified, the port number will be stored in the header of each event using the header name specified here. This allows for interceptors and channel selectors to customize routing logic based on the incoming port.</td>
 </tr>
-<tr class="row-even"><td>charset.default</td>
+<tr class="row-odd"><td>charset.default</td>
 <td>UTF-8</td>
 <td>Default character set used while parsing syslog events into strings.</td>
 </tr>
-<tr class="row-odd"><td>charset.port.&lt;port&gt;</td>
+<tr class="row-even"><td>charset.port.&lt;port&gt;</td>
 <td>&#8211;</td>
 <td>Character set is configurable on a per-port basis.</td>
 </tr>
-<tr class="row-even"><td>batchSize</td>
+<tr class="row-odd"><td>batchSize</td>
 <td>100</td>
 <td>Maximum number of events to attempt to process per request loop. Using the default is usually fine.</td>
 </tr>
-<tr class="row-odd"><td>readBufferSize</td>
+<tr class="row-even"><td>readBufferSize</td>
 <td>1024</td>
 <td>Size of the internal Mina read buffer. Provided for performance tuning. Using the default is usually fine.</td>
 </tr>
-<tr class="row-even"><td>numProcessors</td>
+<tr class="row-odd"><td>numProcessors</td>
 <td>(auto-detected)</td>
 <td>Number of processors available on the system for use while processing messages. Default is to auto-detect # of CPUs using the Java Runtime API. Mina will spawn 2 request-processing threads per detected CPU, which is often reasonable.</td>
 </tr>
-<tr class="row-odd"><td>selector.type</td>
+<tr class="row-even"><td>selector.type</td>
 <td>replicating</td>
 <td>replicating, multiplexing, or custom</td>
 </tr>
-<tr class="row-even"><td>selector.*</td>
+<tr class="row-odd"><td>selector.*</td>
 <td>&#8211;</td>
 <td>Depends on the <tt class="docutils literal"><span class="pre">selector.type</span></tt> value</td>
 </tr>
-<tr class="row-odd"><td>interceptors</td>
+<tr class="row-even"><td>interceptors</td>
 <td>&#8211;</td>
 <td>Space-separated list of interceptors.</td>
 </tr>
-<tr class="row-even"><td>interceptors.*</td>
+<tr class="row-odd"><td>interceptors.*</td>
 <td>&nbsp;</td>
 <td>&nbsp;</td>
 </tr>
@@ -1565,19 +1696,24 @@ basis.</p>
 <td>&#8211;</td>
 <td>Port # to bind to</td>
 </tr>
-<tr class="row-even"><td>selector.type</td>
+<tr class="row-even"><td>keepFields</td>
+<td>false</td>
+<td>Setting this to true will preserve the Priority,
+Timestamp and Hostname in the body of the event.</td>
+</tr>
+<tr class="row-odd"><td>selector.type</td>
 <td>&nbsp;</td>
 <td>replicating or multiplexing</td>
 </tr>
-<tr class="row-odd"><td>selector.*</td>
+<tr class="row-even"><td>selector.*</td>
 <td>replicating</td>
 <td>Depends on the selector.type value</td>
 </tr>
-<tr class="row-even"><td>interceptors</td>
+<tr class="row-odd"><td>interceptors</td>
 <td>&#8211;</td>
 <td>Space-separated list of interceptors</td>
 </tr>
-<tr class="row-odd"><td>interceptors.*</td>
+<tr class="row-even"><td>interceptors.*</td>
 <td>&nbsp;</td>
 <td>&nbsp;</td>
 </tr>
@@ -1653,7 +1789,19 @@ inserted into the channel in one transaction.</p>
 <td>&#8211;</td>
 <td>Space-separated list of interceptors</td>
 </tr>
-<tr class="row-even"><td colspan="3">interceptors.*</td>
+<tr class="row-even"><td>interceptors.*</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+</tr>
+<tr class="row-odd"><td>enableSSL</td>
+<td>false</td>
+<td>Set the property true, to enable SSL</td>
+</tr>
+<tr class="row-even"><td>keystore</td>
+<td>&nbsp;</td>
+<td>Location of the keystore includng keystore file name</td>
+</tr>
+<tr class="row-odd"><td colspan="3">keystorePassword                                              Keystore password</td>
 </tr>
 </tbody>
 </table>
@@ -1927,7 +2075,7 @@ when starting the Flume agent. The type of the custom source is its FQCN.</p>
 <h4>Scribe Source<a class="headerlink" href="#scribe-source" title="Permalink to this headline">¶</a></h4>
 <p>Scribe is another type of ingest system. To adopt existing Scribe ingest system,
 Flume should use ScribeSource based on Thrift with compatible transfering protocol.
-The deployment of Scribe please following guide from Facebook.
+For deployment of Scribe please follow the guide from Facebook.
 Required properties are in <strong>bold</strong>.</p>
 <table border="1" class="docutils">
 <colgroup>
@@ -2208,6 +2356,19 @@ This number should be increased if many HDFS timeout operations are occurring.</
 <td>false</td>
 <td>Use the local time (instead of the timestamp from the event header) while replacing the escape sequences.</td>
 </tr>
+<tr class="row-even"><td>hdfs.closeTries</td>
+<td>0</td>
+<td>Number of times the sink must try to close a file. If set to 1, this sink will not re-try a failed close
+(due to, for example, NameNode or DataNode failure), and may leave the file in an open state with a .tmp extension.
+If set to 0, the sink will try to close the file until the file is eventually closed
+(there is no limit on the number of times it would try).</td>
+</tr>
+<tr class="row-odd"><td>hdfs.retryInterval</td>
+<td>180</td>
+<td>Time in seconds between consecutive attempts to close a file. Each close call costs multiple RPC round-trips to the Namenode,
+so setting this too low can cause a lot of load on the name node. If set to 0 or less, the sink will not
+attempt to close the file if the first attempt fails, and may leave the file open or with a &#8221;.tmp&#8221; extension.</td>
+</tr>
 <tr class="row-even"><td>serializer</td>
 <td><tt class="docutils literal"><span class="pre">TEXT</span></tt></td>
 <td>Other possible options include <tt class="docutils literal"><span class="pre">avro_event</span></tt> or the
@@ -2279,14 +2440,14 @@ batches of the configured batch size.
 Required properties are in <strong>bold</strong>.</p>
 <table border="1" class="docutils">
 <colgroup>
-<col width="7%" />
-<col width="2%" />
-<col width="91%" />
+<col width="6%" />
+<col width="13%" />
+<col width="81%" />
 </colgroup>
 <thead valign="bottom">
 <tr class="row-odd"><th class="head">Property Name</th>
-<th class="head">Default</th>
-<th class="head">Description</th>
+<th class="head">Default  Description</th>
+<th class="head">&nbsp;</th>
 </tr>
 </thead>
 <tbody valign="top">
@@ -2349,6 +2510,10 @@ Required properties are in <strong>bold</strong>.</p>
 <tr class="row-even"><td>truststore-type</td>
 <td>JKS</td>
 <td>The type of the Java truststore. This can be &#8220;JKS&#8221; or other supported Java truststore type.</td>
+</tr>
+<tr class="row-odd"><td>maxIoWorkers</td>
+<td>2 * the number of available processors in the machine</td>
+<td>The maximum number of I/O worker threads. This is configured on the NettyAvroRpcClient NioClientSocketChannelFactory.</td>
 </tr>
 </tbody>
 </table>
@@ -2622,9 +2787,9 @@ based on the given regex and writes each part into different columns.</p>
 <p>Required properties are in <strong>bold</strong>.</p>
 <table border="1" class="docutils">
 <colgroup>
-<col width="12%" />
-<col width="36%" />
-<col width="52%" />
+<col width="10%" />
+<col width="31%" />
+<col width="59%" />
 </colgroup>
 <thead valign="bottom">
 <tr class="row-odd"><th class="head">Property Name</th>
@@ -2649,23 +2814,36 @@ based on the given regex and writes each part into different columns.</p>
 <td>&#8211;</td>
 <td>The column family in Hbase to write to.</td>
 </tr>
+<tr class="row-even"><td>zookeeperQuorum</td>
+<td>&#8211;</td>
+<td>The quorum spec. This is the value for the property <tt class="docutils literal"><span class="pre">hbase.zookeeper.quorum</span></tt> in hbase-site.xml</td>
+</tr>
+<tr class="row-odd"><td>znodeParent</td>
+<td>/hbase</td>
+<td>The base path for the znode for the -ROOT- region. Value of <tt class="docutils literal"><span class="pre">zookeeper.znode.parent</span></tt> in hbase-site.xml</td>
+</tr>
 <tr class="row-even"><td>batchSize</td>
 <td>100</td>
 <td>Number of events to be written per txn.</td>
 </tr>
-<tr class="row-odd"><td>serializer</td>
+<tr class="row-odd"><td>coalesceIncrements</td>
+<td>false</td>
+<td>Should the sink coalesce multiple increments to a cell per batch. This might give
+better performance if there are multiple increments to a limited number of cells.</td>
+</tr>
+<tr class="row-even"><td>serializer</td>
 <td>org.apache.flume.sink.hbase.SimpleHbaseEventSerializer</td>
 <td>Default increment column = &#8220;iCol&#8221;, payload column = &#8220;pCol&#8221;.</td>
 </tr>
-<tr class="row-even"><td>serializer.*</td>
+<tr class="row-odd"><td>serializer.*</td>
 <td>&#8211;</td>
 <td>Properties to be passed to the serializer.</td>
 </tr>
-<tr class="row-odd"><td>kerberosPrincipal</td>
+<tr class="row-even"><td>kerberosPrincipal</td>
 <td>&#8211;</td>
 <td>Kerberos user principal for accessing secure HBase</td>
 </tr>
-<tr class="row-even"><td>kerberosKeytab</td>
+<tr class="row-odd"><td>kerberosKeytab</td>
 <td>&#8211;</td>
 <td>Kerberos keytab for accessing secure HBase</td>
 </tr>
@@ -2685,19 +2863,19 @@ based on the given regex and writes each part into different columns.</p>
 <div class="section" id="asynchbasesink">
 <h5>AsyncHBaseSink<a class="headerlink" href="#asynchbasesink" title="Permalink to this headline">¶</a></h5>
 <p>This sink writes data to HBase using an asynchronous model. A class implementing
-AsyncHbaseEventSerializer
-which is specified by the configuration is used to convert the events into
+AsyncHbaseEventSerializer which is specified by the configuration is used to convert the events into
 HBase puts and/or increments. These puts and increments are then written
-to HBase. This sink provides the same consistency guarantees as HBase,
+to HBase. This sink uses the <a class="reference external" href="https://github.com/OpenTSDB/asynchbase">Asynchbase API</a> to write to
+HBase. This sink provides the same consistency guarantees as HBase,
 which is currently row-wise atomicity. In the event of Hbase failing to
 write certain events, the sink will replay all events in that transaction.
 The type is the FQCN: org.apache.flume.sink.hbase.AsyncHBaseSink.
 Required properties are in <strong>bold</strong>.</p>
 <table border="1" class="docutils">
 <colgroup>
-<col width="9%" />
+<col width="10%" />
 <col width="33%" />
-<col width="58%" />
+<col width="57%" />
 </colgroup>
 <thead valign="bottom">
 <tr class="row-odd"><th class="head">Property Name</th>
@@ -2734,16 +2912,21 @@ Required properties are in <strong>bold</strong>.</p>
 <td>100</td>
 <td>Number of events to be written per txn.</td>
 </tr>
-<tr class="row-odd"><td>timeout</td>
+<tr class="row-odd"><td>coalesceIncrements</td>
+<td>false</td>
+<td>Should the sink coalesce multiple increments to a cell per batch. This might give
+better performance if there are multiple increments to a limited number of cells.</td>
+</tr>
+<tr class="row-even"><td>timeout</td>
 <td>60000</td>
 <td>The length of time (in milliseconds) the sink waits for acks from hbase for
 all events in a transaction.</td>
 </tr>
-<tr class="row-even"><td>serializer</td>
+<tr class="row-odd"><td>serializer</td>
 <td>org.apache.flume.sink.hbase.SimpleAsyncHbaseEventSerializer</td>
 <td>&nbsp;</td>
 </tr>
-<tr class="row-odd"><td>serializer.*</td>
+<tr class="row-even"><td>serializer.*</td>
 <td>&#8211;</td>
 <td>Properties to be passed to the serializer.</td>
 </tr>
@@ -2771,7 +2954,7 @@ will read this information from the first hbase-site.xml file in the classpath.<
 <h4>MorphlineSolrSink<a class="headerlink" href="#morphlinesolrsink" title="Permalink to this headline">¶</a></h4>
 <p>This sink extracts data from Flume events, transforms it, and loads it in near-real-time into Apache Solr servers, which in turn serve queries to end users or search applications.</p>
 <p>This sink is well suited for use cases that stream raw data into HDFS (via the HdfsSink) and simultaneously extract, transform and load the same data into Solr (via MorphlineSolrSink). In particular, this sink can process arbitrary heterogeneous raw data from disparate data sources and turn it into a data model that is useful to Search applications.</p>
-<p>The ETL functionality is customizable using a <a class="reference external" href="http://cloudera.github.io/cdk/docs/0.4.0/cdk-morphlines/index.html">morphline configuration file</a> that defines a chain of transformation commands that pipe event records from one command to another.</p>
+<p>The ETL functionality is customizable using a <a class="reference external" href="http://cloudera.github.io/cdk/docs/current/cdk-morphlines/index.html">morphline configuration file</a> that defines a chain of transformation commands that pipe event records from one command to another.</p>
 <p>Morphlines can be seen as an evolution of Unix pipelines where the data model is generalized to work with streams of generic records, including arbitrary binary payloads. A morphline command is a bit like a Flume Interceptor. Morphlines can be embedded into Hadoop components such as Flume.</p>
 <p>Commands to parse and transform a set of standard data formats such as log files, Avro, CSV, Text, HTML, XML, PDF, Word, Excel, etc. are provided out of the box, and additional custom commands and parsers for additional data formats can be added as morphline plugins. Any kind of data format can be indexed and any Solr documents for any kind of Solr schema can be generated, and any custom ETL logic can be registered and executed.</p>
 <p>Morphlines manipulate continuous streams of records. The data model can be described as follows: A record is a set of named fields where each field has an ordered list of one or more values. A value can be any Java Object. That is, a record is essentially a hash table where each hash table entry contains a String key and a list of Java Objects as values. (The implementation uses Guava&#8217;s <tt class="docutils literal"><span class="pre">ArrayListMultimap</span></tt>, which is a <tt class="docutils literal"><span class="pre">ListMultimap</span></tt>). Note that a field can have multiple values and any two records need not use common field names.</p>
@@ -2857,7 +3040,7 @@ the more powerful ElasticSearchIndexRequestBuilderFactory.</p>
 <table border="1" class="docutils">
 <colgroup>
 <col width="8%" />
-<col width="38%" />
+<col width="37%" />
 <col width="54%" />
 </colgroup>
 <thead valign="bottom">
@@ -2898,7 +3081,10 @@ the more powerful ElasticSearchIndexRequestBuilderFactory.</p>
 <tr class="row-odd"><td>ttl</td>
 <td>&#8211;</td>
 <td>TTL in days, when set will cause the expired documents to be deleted automatically,
-if not set documents will never be automatically deleted</td>
+if not set documents will never be automatically deleted. TTL is accepted both in the earlier form of
+integer only e.g. a1.sinks.k1.ttl = 5 and also with a qualifier ms (millisecond), s (second), m (minute),
+h (hour), d (day) and w (week). Example a1.sinks.k1.ttl = 5d will set TTL to 5 days. Follow
+<a class="reference external" href="http://www.elasticsearch.org/guide/reference/mapping/ttl-field/">http://www.elasticsearch.org/guide/reference/mapping/ttl-field/</a> for more information.</td>
 </tr>
 <tr class="row-even"><td>serializer</td>
 <td>org.apache.flume.sink.elasticsearch.ElasticSearchLogStashEventSerializer</td>
@@ -2920,11 +3106,86 @@ either class are accepted but ElasticSearchIndexRequestBuilderFactory is preferr
 <span class="na">a1.sinks.k1.indexType</span> <span class="o">=</span> <span class="s">bar_type</span>
 <span class="na">a1.sinks.k1.clusterName</span> <span class="o">=</span> <span class="s">foobar_cluster</span>
 <span class="na">a1.sinks.k1.batchSize</span> <span class="o">=</span> <span class="s">500</span>
-<span class="na">a1.sinks.k1.ttl</span> <span class="o">=</span> <span class="s">5</span>
+<span class="na">a1.sinks.k1.ttl</span> <span class="o">=</span> <span class="s">5d</span>
 <span class="na">a1.sinks.k1.serializer</span> <span class="o">=</span> <span class="s">org.apache.flume.sink.elasticsearch.ElasticSearchDynamicSerializer</span>
 <span class="na">a1.sinks.k1.channel</span> <span class="o">=</span> <span class="s">c1</span>
 </pre></div>
 </div>
+</div>
+<div class="section" id="kite-dataset-sink-experimental">
+<h4>Kite Dataset Sink (experimental)<a class="headerlink" href="#kite-dataset-sink-experimental" title="Permalink to this headline">¶</a></h4>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">This source is experimental and may change between minor versions of Flume.
+Use at your own risk.</p>
+</div>
+<p>Experimental sink that writes events to a <a class="reference external" href="http://kitesdk.org/docs/current/kite-data/guide.html">Kite Dataset</a>.
+This sink will deserialize the body of each incoming event and store the
+resulting record in a Kite Dataset. It determines target Dataset by opening a
+repository URI, <tt class="docutils literal"><span class="pre">kite.repo.uri</span></tt>, and loading a Dataset by name,
+<tt class="docutils literal"><span class="pre">kite.dataset.name</span></tt>.</p>
+<p>The only supported serialization is avro, and the record schema must be passed
+in the event headers, using either <tt class="docutils literal"><span class="pre">flume.avro.schema.literal</span></tt> with the JSON
+schema representation or <tt class="docutils literal"><span class="pre">flume.avro.schema.url</span></tt> with a URL where the schema
+may be found (<tt class="docutils literal"><span class="pre">hdfs:/...</span></tt> URIs are supported). This is compatible with the
+Log4jAppender flume client and the spooling directory source&#8217;s Avro
+deserializer using <tt class="docutils literal"><span class="pre">deserializer.schemaType</span> <span class="pre">=</span> <span class="pre">LITERAL</span></tt>.</p>
+<p>Note 1: The <tt class="docutils literal"><span class="pre">flume.avro.schema.hash</span></tt> header is <strong>not supported</strong>.
+Note 2: In some cases, file rolling may occur slightly after the roll interval
+has been exceeded. However, this delay will not exceed 5 seconds. In most
+cases, the delay is neglegible.</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="26%" />
+<col width="8%" />
+<col width="66%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Property Name</th>
+<th class="head">Default</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><strong>channel</strong></td>
+<td>&#8211;</td>
+<td>&nbsp;</td>
+</tr>
+<tr class="row-odd"><td><strong>type</strong></td>
+<td>&#8211;</td>
+<td>Must be org.apache.flume.sink.kite.DatasetSink</td>
+</tr>
+<tr class="row-even"><td><strong>kite.repo.uri</strong></td>
+<td>&#8211;</td>
+<td>URI of the repository to open</td>
+</tr>
+<tr class="row-odd"><td><strong>kite.dataset.name</strong></td>
+<td>&#8211;</td>
+<td>Name of the Dataset where records will be written</td>
+</tr>
+<tr class="row-even"><td>kite.batchSize</td>
+<td>100</td>
+<td>Number of records to process in each batch</td>
+</tr>
+<tr class="row-odd"><td>kite.rollInterval</td>
+<td>30</td>
+<td>Maximum wait time (seconds) before data files are released</td>
+</tr>
+<tr class="row-even"><td>auth.kerberosPrincipal</td>
+<td>&#8211;</td>
+<td>Kerberos user principal for secure authentication to HDFS</td>
+</tr>
+<tr class="row-odd"><td>auth.kerberosKeytab</td>
+<td>&#8211;</td>
+<td>Kerberos keytab location (local FS) for the principal</td>
+</tr>
+<tr class="row-even"><td>auth.proxyUser</td>
+<td>&#8211;</td>
+<td>The effective user for HDFS actions, if different from
+the kerberos principal</td>
+</tr>
+</tbody>
+</table>
 </div>
 <div class="section" id="custom-sink">
 <h4>Custom Sink<a class="headerlink" href="#custom-sink" title="Permalink to this headline">¶</a></h4>
@@ -3157,10 +3418,10 @@ READ_COMMITTED, SERIALIZABLE, REPEATABLE_READ</td>
 </tr>
 <tr class="row-even"><td>dataDirs</td>
 <td>~/.flume/file-channel/data</td>
-<td>The directory where log files will be stored</td>
+<td>Comma separated list of directories for storing log files. Using multiple directories on separate disks can improve file channel peformance</td>
 </tr>
 <tr class="row-odd"><td>transactionCapacity</td>
-<td>1000</td>
+<td>10000</td>
 <td>The maximum size of transaction supported by the channel</td>
 </tr>
 <tr class="row-even"><td>checkpointInterval</td>
@@ -3182,14 +3443,6 @@ READ_COMMITTED, SERIALIZABLE, REPEATABLE_READ</td>
 <tr class="row-even"><td>keep-alive</td>
 <td>3</td>
 <td>Amount of time (in sec) to wait for a put operation</td>
-</tr>
-<tr class="row-odd"><td>write-timeout</td>
-<td>3</td>
-<td>Amount of time (in sec) to wait for a write operation</td>
-</tr>
-<tr class="row-even"><td>checkpoint-timeout</td>
-<td>600</td>
-<td>Expert: Amount of time (in sec) to wait for a checkpoint</td>
 </tr>
 <tr class="row-odd"><td>use-log-replay-v1</td>
 <td>false</td>
@@ -3290,6 +3543,103 @@ not available for checkpoint and data directories.</p>
 <span class="na">a1.channels.c1.encryption.keyProvider.keyStorePasswordFile</span> <span class="o">=</span> <span class="s">/path/to/my.keystore.password</span>
 <span class="na">a1.channels.c1.encryption.keyProvider.keys</span> <span class="o">=</span> <span class="s">key-0 key-1</span>
 <span class="na">a1.channels.c1.encryption.keyProvider.keys.key-0.passwordFile</span> <span class="o">=</span> <span class="s">/path/to/key-0.password</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="spillable-memory-channel">
+<h4>Spillable Memory Channel<a class="headerlink" href="#spillable-memory-channel" title="Permalink to this headline">¶</a></h4>
+<p>The events are stored in an in-memory queue and on disk. The in-memory queue serves as the primary store and the disk as overflow.
+The disk store is managed using an embedded File channel. When the in-memory queue is full, additional incoming events are stored in
+the file channel. This channel is ideal for flows that need high throughput of memory channel during normal operation, but at the
+same time need the larger capacity of the file channel for better tolerance of intermittent sink side outages or drop in drain rates.
+The throughput will reduce approximately to file channel speeds during such abnormal situations. In case of an agent crash or restart,
+only the events stored on disk are recovered when the agent comes online. <strong>This channel is currently experimental and
+not recommended for use in production.</strong></p>
+<p>Required properties are in <strong>bold</strong>. Please refer to file channel for additional required properties.</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="18%" />
+<col width="10%" />
+<col width="72%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Property Name</th>
+<th class="head">Default</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><strong>type</strong></td>
+<td>&#8211;</td>
+<td>The component type name, needs to be <tt class="docutils literal"><span class="pre">SPILLABLEMEMORY</span></tt></td>
+</tr>
+<tr class="row-odd"><td>memoryCapacity</td>
+<td>10000</td>
+<td>Maximum number of events stored in memory queue. To disable use of in-memory queue, set this to zero.</td>
+</tr>
+<tr class="row-even"><td>overflowCapacity</td>
+<td>100000000</td>
+<td>Maximum number of events stored in overflow disk (i.e File channel). To disable use of overflow, set this to zero.</td>
+</tr>
+<tr class="row-odd"><td>overflowTimeout</td>
+<td>3</td>
+<td>The number of seconds to wait before enabling disk overflow when memory fills up.</td>
+</tr>
+<tr class="row-even"><td>byteCapacityBufferPercentage</td>
+<td>20</td>
+<td>Defines the percent of buffer between byteCapacity and the estimated total size
+of all events in the channel, to account for data in headers. See below.</td>
+</tr>
+<tr class="row-odd"><td>byteCapacity</td>
+<td>see description</td>
+<td>Maximum <strong>bytes</strong> of memory allowed as a sum of all events in the memory queue.
+The implementation only counts the Event <tt class="docutils literal"><span class="pre">body</span></tt>, which is the reason for
+providing the <tt class="docutils literal"><span class="pre">byteCapacityBufferPercentage</span></tt> configuration parameter as well.
+Defaults to a computed value equal to 80% of the maximum memory available to
+the JVM (i.e. 80% of the -Xmx value passed on the command line).
+Note that if you have multiple memory channels on a single JVM, and they happen
+to hold the same physical events (i.e. if you are using a replicating channel
+selector from a single source) then those event sizes may be double-counted for
+channel byteCapacity purposes.
+Setting this value to <tt class="docutils literal"><span class="pre">0</span></tt> will cause this value to fall back to a hard
+internal limit of about 200 GB.</td>
+</tr>
+<tr class="row-even"><td>avgEventSize</td>
+<td>500</td>
+<td>Estimated average size of events, in bytes, going into the channel</td>
+</tr>
+<tr class="row-odd"><td>&lt;file channel properties&gt;</td>
+<td>see file channel</td>
+<td>Any file channel property with the exception of &#8216;keep-alive&#8217; and &#8216;capacity&#8217; can be used.
+The keep-alive of file channel is managed by Spillable Memory Channel. Use &#8216;overflowCapacity&#8217;
+to set the File channel&#8217;s capacity.</td>
+</tr>
+</tbody>
+</table>
+<p>In-memory queue is considered full if either memoryCapacity or byteCapacity limit is reached.</p>
+<p>Example for agent named a1:</p>
+<div class="highlight-properties"><div class="highlight"><pre><span class="na">a1.channels</span> <span class="o">=</span> <span class="s">c1</span>
+<span class="na">a1.channels.c1.type</span> <span class="o">=</span> <span class="s">SPILLABLEMEMORY</span>
+<span class="na">a1.channels.c1.memoryCapacity</span> <span class="o">=</span> <span class="s">10000</span>
+<span class="na">a1.channels.c1.overflowCapacity</span> <span class="o">=</span> <span class="s">1000000</span>
+<span class="na">a1.channels.c1.byteCapacity</span> <span class="o">=</span> <span class="s">800000</span>
+<span class="na">a1.channels.c1.checkpointDir</span> <span class="o">=</span> <span class="s">/mnt/flume/checkpoint</span>
+<span class="na">a1.channels.c1.dataDirs</span> <span class="o">=</span> <span class="s">/mnt/flume/data</span>
+</pre></div>
+</div>
+<p>To disable the use of the in-memory queue and function like a file channel:</p>
+<div class="highlight-properties"><div class="highlight"><pre><span class="na">a1.channels</span> <span class="o">=</span> <span class="s">c1</span>
+<span class="na">a1.channels.c1.type</span> <span class="o">=</span> <span class="s">SPILLABLEMEMORY</span>
+<span class="na">a1.channels.c1.memoryCapacity</span> <span class="o">=</span> <span class="s">0</span>
+<span class="na">a1.channels.c1.overflowCapacity</span> <span class="o">=</span> <span class="s">1000000</span>
+<span class="na">a1.channels.c1.checkpointDir</span> <span class="o">=</span> <span class="s">/mnt/flume/checkpoint</span>
+<span class="na">a1.channels.c1.dataDirs</span> <span class="o">=</span> <span class="s">/mnt/flume/data</span>
+</pre></div>
+</div>
+<p>To disable the use of overflow disk and function purely as a in-memory channel:</p>
+<div class="highlight-properties"><div class="highlight"><pre><span class="na">a1.channels</span> <span class="o">=</span> <span class="s">c1</span>
+<span class="na">a1.channels.c1.type</span> <span class="o">=</span> <span class="s">SPILLABLEMEMORY</span>
+<span class="na">a1.channels.c1.memoryCapacity</span> <span class="o">=</span> <span class="s">100000</span>
 </pre></div>
 </div>
 </div>
@@ -3928,7 +4278,7 @@ multiple static interceptors each defining one static header.</p>
 </div>
 <div class="section" id="morphline-interceptor">
 <h4>Morphline Interceptor<a class="headerlink" href="#morphline-interceptor" title="Permalink to this headline">¶</a></h4>
-<p>This interceptor filters the events through a <a class="reference external" href="http://cloudera.github.io/cdk/docs/0.4.0/cdk-morphlines/index.html">morphline configuration file</a> that defines a chain of transformation commands that pipe records from one command to another.
+<p>This interceptor filters the events through a <a class="reference external" href="http://cloudera.github.io/cdk/docs/current/cdk-morphlines/index.html">morphline configuration file</a> that defines a chain of transformation commands that pipe records from one command to another.
 For example the morphline can ignore certain events or alter or insert certain event headers via regular expression based pattern matching, or it can auto-detect and set a MIME type via Apache Tika on events that are intercepted. For example, this kind of packet sniffing can be used for content based dynamic routing in a Flume topology.
 MorphlineInterceptor can also help to implement dynamic routing to multiple Apache Solr collections (e.g. for multi-tenancy).</p>
 <p>Currently, there is a restriction in that the morphline of an interceptor must not generate more than one output record for each input event. This interceptor is not intended for heavy duty ETL processing - if you need this consider moving ETL processing from the Flume Source to a Flume Sink, e.g. to a MorphlineSolrSink.</p>
@@ -4059,11 +4409,11 @@ in anyway you like.</p>
 <div class="section" id="example-1">
 <h4>Example 1:<a class="headerlink" href="#example-1" title="Permalink to this headline">¶</a></h4>
 <p>If the Flume event body contained <tt class="docutils literal"><span class="pre">1:2:3.4foobar5</span></tt> and the following configuration was used</p>
-<div class="highlight-properties"><div class="highlight"><pre><span class="na">agent.sources.r1.interceptors.i1.regex</span> <span class="o">=</span> <span class="s">(\\d):(\\d):(\\d)</span>
-<span class="na">agent.sources.r1.interceptors.i1.serializers</span> <span class="o">=</span> <span class="s">s1 s2 s3</span>
-<span class="na">agent.sources.r1.interceptors.i1.serializers.s1.name</span> <span class="o">=</span> <span class="s">one</span>
-<span class="na">agent.sources.r1.interceptors.i1.serializers.s2.name</span> <span class="o">=</span> <span class="s">two</span>
-<span class="na">agent.sources.r1.interceptors.i1.serializers.s3.name</span> <span class="o">=</span> <span class="s">three</span>
+<div class="highlight-properties"><div class="highlight"><pre><span class="na">a1.sources.r1.interceptors.i1.regex</span> <span class="o">=</span> <span class="s">(\\d):(\\d):(\\d)</span>
+<span class="na">a1.sources.r1.interceptors.i1.serializers</span> <span class="o">=</span> <span class="s">s1 s2 s3</span>
+<span class="na">a1.sources.r1.interceptors.i1.serializers.s1.name</span> <span class="o">=</span> <span class="s">one</span>
+<span class="na">a1.sources.r1.interceptors.i1.serializers.s2.name</span> <span class="o">=</span> <span class="s">two</span>
+<span class="na">a1.sources.r1.interceptors.i1.serializers.s3.name</span> <span class="o">=</span> <span class="s">three</span>
 </pre></div>
 </div>
 <p>The extracted event will contain the same body but the following headers will have been added <tt class="docutils literal"><span class="pre">one=&gt;1,</span> <span class="pre">two=&gt;2,</span> <span class="pre">three=&gt;3</span></tt></p>
@@ -4071,11 +4421,11 @@ in anyway you like.</p>
 <div class="section" id="example-2">
 <h4>Example 2:<a class="headerlink" href="#example-2" title="Permalink to this headline">¶</a></h4>
 <p>If the Flume event body contained <tt class="docutils literal"><span class="pre">2012-10-18</span> <span class="pre">18:47:57,614</span> <span class="pre">some</span> <span class="pre">log</span> <span class="pre">line</span></tt> and the following configuration was used</p>
-<div class="highlight-properties"><div class="highlight"><pre><span class="na">agent.sources.r1.interceptors.i1.regex</span> <span class="o">=</span> <span class="s">^(?:\\n)?(\\d\\d\\d\\d-\\d\\d-\\d\\d\\s\\d\\d:\\d\\d)</span>
-<span class="na">agent.sources.r1.interceptors.i1.serializers</span> <span class="o">=</span> <span class="s">s1</span>
-<span class="na">agent.sources.r1.interceptors.i1.serializers.s1.type</span> <span class="o">=</span> <span class="s">org.apache.flume.interceptor.RegexExtractorInterceptorMillisSerializer</span>
-<span class="na">agent.sources.r1.interceptors.i1.serializers.s1.name</span> <span class="o">=</span> <span class="s">timestamp</span>
-<span class="na">agent.sources.r1.interceptors.i1.serializers.s1.pattern</span> <span class="o">=</span> <span class="s">yyyy-MM-dd HH:mm</span>
+<div class="highlight-properties"><div class="highlight"><pre><span class="na">a1.sources.r1.interceptors.i1.regex</span> <span class="o">=</span> <span class="s">^(?:\\n)?(\\d\\d\\d\\d-\\d\\d-\\d\\d\\s\\d\\d:\\d\\d)</span>
+<span class="na">a1.sources.r1.interceptors.i1.serializers</span> <span class="o">=</span> <span class="s">s1</span>
+<span class="na">a1.sources.r1.interceptors.i1.serializers.s1.type</span> <span class="o">=</span> <span class="s">org.apache.flume.interceptor.RegexExtractorInterceptorMillisSerializer</span>
+<span class="na">a1.sources.r1.interceptors.i1.serializers.s1.name</span> <span class="o">=</span> <span class="s">timestamp</span>
+<span class="na">a1.sources.r1.interceptors.i1.serializers.s1.pattern</span> <span class="o">=</span> <span class="s">yyyy-MM-dd HH:mm</span>
 </pre></div>
 </div>
 <p>the extracted event will contain the same body but the following headers will have been added <tt class="docutils literal"><span class="pre">timestamp=&gt;1350611220000</span></tt></p>
@@ -4130,13 +4480,13 @@ polling rather than terminating.</p>
 <h2>Log4J Appender<a class="headerlink" href="#log4j-appender" title="Permalink to this headline">¶</a></h2>
 <p>Appends Log4j events to a flume agent&#8217;s avro source. A client using this
 appender must have the flume-ng-sdk in the classpath (eg,
-flume-ng-sdk-1.4.0.jar).
+flume-ng-sdk-1.5.0.jar).
 Required properties are in <strong>bold</strong>.</p>
 <table border="1" class="docutils">
 <colgroup>
-<col width="23%" />
-<col width="8%" />
-<col width="69%" />
+<col width="19%" />
+<col width="6%" />
+<col width="75%" />
 </colgroup>
 <thead valign="bottom">
 <tr class="row-odd"><th class="head">Property Name</th>
@@ -4162,7 +4512,7 @@ send the events.</td>
 </tr>
 <tr class="row-odd"><td>AvroReflectionEnabled</td>
 <td>false</td>
-<td>Use Avro Reflection to serialize Log4j events.</td>
+<td>Use Avro Reflection to serialize Log4j events. (Do not use when users log strings)</td>
 </tr>
 <tr class="row-even"><td>AvroSchemaUrl</td>
 <td>&#8211;</td>
@@ -4210,7 +4560,7 @@ then the schema will be included as a Flume header.</p>
 <h2>Load Balancing Log4J Appender<a class="headerlink" href="#load-balancing-log4j-appender" title="Permalink to this headline">¶</a></h2>
 <p>Appends Log4j events to a list of flume agent&#8217;s avro source. A client using this
 appender must have the flume-ng-sdk in the classpath (eg,
-flume-ng-sdk-1.4.0.jar). This appender supports a round-robin and random
+flume-ng-sdk-1.5.0.jar). This appender supports a round-robin and random
 scheme for performing the load balancing. It also supports a configurable backoff
 timeout so that down agents are removed temporarily from the set of hosts
 Required properties are in <strong>bold</strong>.</p>
@@ -4330,15 +4680,15 @@ and can be specified in the flume-env.sh:</p>
 </tr>
 <tr class="row-odd"><td><strong>hosts</strong></td>
 <td>&#8211;</td>
-<td>Comma-separated list of <tt class="docutils literal"><span class="pre">hostname:port</span></tt></td>
+<td>Comma-separated list of <tt class="docutils literal"><span class="pre">hostname:port</span></tt> of Ganglia servers</td>
 </tr>
-<tr class="row-even"><td>pollInterval</td>
+<tr class="row-even"><td>pollFrequency</td>
 <td>60</td>
-<td>Time, in seconds, between consecutive reporting to ganglia server</td>
+<td>Time, in seconds, between consecutive reporting to Ganglia server</td>
 </tr>
 <tr class="row-odd"><td>isGanglia3</td>
 <td>false</td>
-<td>Ganglia server version is 3. By default, Flume sends in ganglia 3.1 format</td>
+<td>Ganglia server version is 3. By default, Flume sends in Ganglia 3.1 format</td>
 </tr>
 </tbody>
 </table>
@@ -4403,7 +4753,7 @@ a Web server on a configurable port. Flume reports metrics in the following JSON
 </tr>
 </tbody>
 </table>
-<p>We can start Flume with Ganglia support as follows:</p>
+<p>We can start Flume with JSON Reporting support as follows:</p>
 <div class="highlight-none"><div class="highlight"><pre>$ bin/flume-ng agent --conf-file example.conf --name a1 -Dflume.monitoring.type=http -Dflume.monitoring.port=34545
 </pre></div>
 </div>
@@ -4894,7 +5244,7 @@ can be leveraged to move the Flume agent to another host.</p>
             </a></p>
   <h3><a href="index.html">Table Of Contents</a></h3>
   <ul>
-<li><a class="reference internal" href="#">Flume 1.4.0 User Guide</a><ul>
+<li><a class="reference internal" href="#">Flume 1.5.0 User Guide</a><ul>
 <li><a class="reference internal" href="#introduction">Introduction</a><ul>
 <li><a class="reference internal" href="#overview">Overview</a></li>
 <li><a class="reference internal" href="#system-requirements">System Requirements</a></li>
@@ -4945,7 +5295,8 @@ can be leveraged to move the Flume agent to another host.</p>
 <li><a class="reference internal" href="#converter">Converter</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#spooling-directory-source">Spooling Directory Source</a><ul>
+<li><a class="reference internal" href="#spooling-directory-source">Spooling Directory Source</a></li>
+<li><a class="reference internal" href="#twitter-1-firehose-source-experimental">Twitter 1% firehose Source (experimental)</a><ul>
 <li><a class="reference internal" href="#event-deserializers">Event Deserializers</a><ul>
 <li><a class="reference internal" href="#line">LINE</a></li>
 <li><a class="reference internal" href="#avro">AVRO</a></li>
@@ -4991,6 +5342,7 @@ can be leveraged to move the Flume agent to another host.</p>
 </li>
 <li><a class="reference internal" href="#morphlinesolrsink">MorphlineSolrSink</a></li>
 <li><a class="reference internal" href="#elasticsearchsink">ElasticSearchSink</a></li>
+<li><a class="reference internal" href="#kite-dataset-sink-experimental">Kite Dataset Sink (experimental)</a></li>
 <li><a class="reference internal" href="#custom-sink">Custom Sink</a></li>
 </ul>
 </li>
@@ -4998,6 +5350,7 @@ can be leveraged to move the Flume agent to another host.</p>
 <li><a class="reference internal" href="#memory-channel">Memory Channel</a></li>
 <li><a class="reference internal" href="#jdbc-channel">JDBC Channel</a></li>
 <li><a class="reference internal" href="#file-channel">File Channel</a></li>
+<li><a class="reference internal" href="#spillable-memory-channel">Spillable Memory Channel</a></li>
 <li><a class="reference internal" href="#pseudo-transaction-channel">Pseudo Transaction Channel</a></li>
 <li><a class="reference internal" href="#custom-channel">Custom Channel</a></li>
 </ul>

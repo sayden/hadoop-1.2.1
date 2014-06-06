@@ -26,6 +26,7 @@ org.apache.flume.node
 org.apache.flume.serialization
 org.apache.flume.sink
 org.apache.flume.sink.elasticsearch
+org.apache.flume.sink.elasticsearch.client
 org.apache.flume.sink.hbase
 org.apache.flume.sink.hdfs
 org.apache.flume.sink.irc
@@ -36,6 +37,7 @@ org.apache.flume.source.http
 org.apache.flume.source.jms
 org.apache.flume.source.scribe
 org.apache.flume.source.thriftLegacy
+org.apache.flume.source.twitter
 org.apache.flume.thrift
 org.apache.flume.tools
 org.apache.flume.util
