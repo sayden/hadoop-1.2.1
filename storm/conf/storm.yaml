@@ -1,10 +1,9 @@
 ########### These MUST be filled in for a storm configuration
- storm.zookeeper.servers:
-     - "172.17.0.2"
+storm.zookeeper.servers:
+     - "asusnotebook"
 #     - "server2"
 # 
- nimbus.host: "asusnotebook"
- storm.local.dir: "/var/hadoop/storm/tmp"
+nimbus.host: "asusnotebook"
 # 
 # 
 # ##### These may optionally be filled in:

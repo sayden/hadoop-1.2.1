@@ -3,6 +3,9 @@ package bolts;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
@@ -58,13 +61,14 @@ public class ContadorPalabrasBolt extends BaseRichBolt
 	@Override
 	public void cleanup() {
 		super.cleanup();
-		System.out.println(
-				"-- Contador palabras [" + nombre + "-" + id + "] --");
+		System.out.println("[WORDCOUNTBOLT]-- Contador palabras [" + nombre + "-" + id + "] --");
+
+		Logger logger = LoggerFactory.getLogger(getClass());
 		
 		for(Map.Entry<String, Integer> resultado: cuenta.entrySet())
 		{
-			System.out.println(
-					resultado.getKey() + ", " + resultado.getValue());
+			System.out.println("[WORDCOUNTBOLT]" + resultado.getKey() + ", " + resultado.getValue());
+			logger.info("[WORDCOUNTBOLT]" + resultado.getKey() + ", " + resultado.getValue());
 		}
 	}
 
